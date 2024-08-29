@@ -12,6 +12,15 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 
 function onTabActive() {
 	chrome.tabs.query({ active: true, currentWindow: true }, async function ([tab]) {
+		if (/^https:\/\/redmine.altava.com\//.test(tab.url)) {
+			await injectContentJS(tab);
+			const cssData = await fetch(chrome.runtime.getURL(`css/redmine.altava.com.css`)).then(resp => resp.text());
+			console.log({ cssData });
+			return chrome.tabs.sendMessage(tab.id, {
+				action: 'style',
+				data: cssData,
+			});
+		}
 		console.log('NOTHING TO DO on this page', tab.url);
 	});
 }

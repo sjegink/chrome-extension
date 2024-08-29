@@ -1,0 +1,387 @@
+@media (prefers-color-scheme: dark) {
+
+	/*
+		0
+		전역 설정
+	*/
+	:root {
+		--color-darktheme-text-white: #FFF;
+		--color-darktheme-text-default: #DDD;
+		--color-darktheme-text-dim: #BBB;
+		--color-darktheme-text-href: #3399ff;
+		--color-darktheme-text-href-lighter: #CDF;
+
+		--color-darktheme-bg-light: #666;
+		--color-darktheme-bg-default: #333;
+		--color-darktheme-bg-strong: #222;
+		--color-darktheme-bg-black: #000;
+
+		--color-darktheme-ln-black: #000;
+		--color-darktheme-ln-guide: #666;
+		--color-darktheme-ln-table: #666;
+		--color-darktheme-ln-button: #9995;
+	}
+
+	body {
+		background-color: var(--color-darktheme-bg-default);
+		color: var(--color-darktheme-text-default);
+	}
+
+	a,
+	div.tabs:not(#main-menu)>ul>li>a {
+		color: var(--color-darktheme-text-href);
+	}
+
+	a.icon:focus,
+	a.icon:hover,
+	a.icon-only:focus,
+	a.icon-only:hover {
+		color: var(--color-darktheme-text-white);
+	}
+
+	.badge-status-open {
+		--color-darktheme-status-active: #0099ff;
+		border-color: var(--color-darktheme-status-active);
+		color: var(--color-darktheme-status-active);
+	}
+
+	p.buttons>a,
+	.other-formats>span>a,
+	#wiki_add_attachment>p>a,
+	#content>.contextual>a,
+	#content>.contextual>span:not(.drdn)>a,
+	#query_form>.contextual>a,
+	#query_form_with_buttons>.contextual>a {
+		content: '버튼 테마';
+		border-color: var(--color-darktheme-ln-button);
+		background-color: var(--color-darktheme-bg-light);
+		color: var(--color-darktheme-text-default);
+	}
+
+	p.buttons>a:hover,
+	p.buttons>a:focus,
+	.other-formats>span>a:hover,
+	.other-formats>span>a:focus,
+	#wiki_add_attachment>p>a:hover,
+	#wiki_add_attachment>p>a:focus,
+	#content>.contextual>a:hover,
+	#content>.contextual>a:focus,
+	#content>.contextual>span:not(.drdn)>a:hover,
+	#content>.contextual>span:not(.drdn)>a:focus,
+	#query_form>.contextual>a:hover,
+	#query_form>.contextual>a:focus,
+	#query_form_with_buttons>.contextual>a:hover,
+	#query_form_with_buttons>.contextual>a:focus {
+		content: '버튼 호버효과';
+		border-color: #FFF;
+		background-color: var(--color-darktheme-bg-light);
+		color: var(--color-darktheme-text-white);
+	}
+
+	#project-jump .drdn-trigger,
+	select,
+	textarea,
+	input[type=datetime],
+	input[type=datetime-local],
+	input[type=date],
+	input[type=month],
+	input[type=time],
+	input[type=week],
+	input[type=number],
+	input[type=url],
+	input[type=tel],
+	input[type=color],
+	input[type=search],
+	input[type=email],
+	input[type=text],
+	input[type=password] {
+		content: '입력기 테마';
+		border-color: #9995;
+		background-color: var(--color-darktheme-bg-light);
+		box-shadow: inset 0 1px 2px rgba(255, 255, 255, .075);
+		color: var(--color-darktheme-text-default);
+	}
+
+	/*
+		1
+		메뉴
+	*/
+
+	#sidebar ul:not(.watchers) li>a:not(.icon-only).selected {
+		background-color: #FFF7;
+		border-top-color: transparent;
+		border-bottom-color: transparent;
+	}
+
+	#sidebar ul:not(.watchers) li>a:not(.icon-only):hover {
+		background-color: #FFFB;
+		border-top-color: transparent;
+		border-bottom-color: transparent;
+		color: #212136;
+		text-decoration: none;
+	}
+
+	/*
+		2
+		개요
+	*/
+
+	.box {
+		content: '일감 추적';
+		background-color: var(--color-darktheme-bg-strong);
+		color: var(--color-darktheme-text-heavy);
+	}
+
+	h3.icon,
+	h3.version,
+	h3.comments,
+	div.issues h3,
+	div.members h3,
+	div.news h3,
+	div.projects h3 {
+		color: var(--color-darktheme-text-default);
+	}
+
+	/*
+		3
+		프로젝트와 칸반
+	*/
+
+
+	#filters-table {
+		content: '칸반 검색도구 [v]적용라벨';
+		color: var(--color-darktheme-text-default);
+	}
+
+	#filters-table select {
+		content: '칸반 검색도구 셀렉트';
+		background-color: var(--color-darktheme-bg-light);
+		color: var(--color-darktheme-text-default);
+	}
+
+	.issue-status__wip,
+	.issue-status__title {
+		content: '칸반 요약박스 전경색';
+		color: var(--color-darktheme-text-default);
+	}
+
+	.issue-status__options-btn .options-icon {
+		content: '칸반 접고펴기 꺽쇠';
+		filter: invert(1);
+	}
+
+	#projects-index ul.projects.root>li,
+	.issuesboard-statuses__scroller,
+	.issuesboard-list {
+		content: '프로젝트 & 칸반 영역 배경색';
+		background-color: var(--color-darktheme-bg-strong);
+	}
+
+	.issuesboard-list--wrapper:not(:last-child) {
+		content: '칸반 구분선';
+		border-color: var(--color-darktheme-ln-guide);
+	}
+
+	.kanban-item {
+		content: '칸반항목 배경색';
+		background-color: var(--color-darktheme-bg-default);
+	}
+
+	.kanban-item:hover {
+		content: '칸반항목 배경색 호버효과';
+		background-color: var(--color-darktheme-bg-black);
+	}
+
+	a.icon, a.icon-only {
+		content: '프로젝트 항목 링크';
+		color: var(--color-darktheme-text-href);
+	}
+	#projects-index ul.projects ul.projects {
+		content: '프로젝트 뎁스 들여쓰기 라인';
+		border-color: var(--color-darktheme-ln-table);
+	}
+
+	.ki-header__issue-type .task-number {
+		content: '칸반항목 일감번호';
+		color: var(--color-darktheme-text-href-lighter);
+	}
+
+	.kanban-item__author,
+	.kanban-item__updated-at,
+	.kanban-item__project,
+	.kanban-item__subject {
+		content: '칸반항목 내용 전경색';
+		color: var(--color-darktheme-text-default) !important;
+	}
+
+	.kanban-item__subject:hover {
+		content: '칸반항목 타이틀 호버효과';
+		color: var(--color-darktheme-text-white) !important;
+	}
+
+
+	/*
+		4
+		일감 목록
+	*/
+
+	a.collapsible,
+	a.collapsible.icon,
+	.collapsible>legend {
+		content: '일감 검색조건 펼치기';
+		color: var(--color-darktheme-text-href);
+	}
+
+	table.list th,
+	table.list .table-list-header {
+		content: '일감 표 제목줄 배경';
+		background-color: var(--color-darktheme-bg-strong);
+	}
+
+	table.list th a,
+	table.list .table-list-header a {
+		content: '일감 표 제목줄 전경';
+		color: var(--color-darktheme-text-href-lighter);
+	}
+
+	table.list>tbody>tr:nth-child(n):hover:not(.ui-sortable-helper) {
+		content: '일감 표 행 호버효과';
+		background-color: var(--color-darktheme-bg-black);
+	}
+
+	#context-menu ul {
+		content: '우클릭 팝업메뉴';
+		background-color: var(--color-darktheme-bg-strong);
+	}
+
+	#wrapper #context-menu a:not(.easy-mindmup__icon).disabled {
+		content: '우클릭 팝업메뉴 비활성항목';
+		color: #FFF3 !important;
+		cursor: default;
+	}
+
+	#wrapper #context-menu li:hover,
+	#wrapper #context-menu a:not(.easy-mindmup__icon):hover {
+		background-color: var(--color-darktheme-bg-black);
+		color: #FFF;
+	}
+
+	/*
+		5
+		로드맵 및 일감 상세
+	*/
+
+	legend {
+		color: var(--color-darktheme-text-default);
+	}
+
+	.issue.details>.subject h3 {
+		color: #ebebdd;
+	}
+
+	.checklist-title {
+		color: var(--color-darktheme-text-default);
+	}
+
+	.issue .attribute .value {
+		color: var(--color-darktheme-text-default);
+	}
+
+	div.wiki {
+		color: var(--color-darktheme-text-default);
+		content: '일감 상세 본문';
+	}
+
+	/*
+		6
+		간트와 달력
+	*/
+
+	.gantt_hdr {
+		content: '간트 > 선';
+		border-color: var(--color-darktheme-ln-guide);
+	}
+
+	.gantt_hdr[style*=background] {
+		content: '간트 > 배경색';
+		background-color: var(--color-darktheme-bg-strong) !important;
+	}
+
+	table.cal,
+	table.cal td {
+		content: '달력 > 선';
+		border-color: var(--color-darktheme-ln-guide);
+	}
+
+	table.cal thead th,
+	table.cal td.week-number {
+		content: '달력 > 주/요일 표시줄';
+		background-color: var(--color-darktheme-bg-strong);
+	}
+
+	table.cal td.today {
+		content: '달력 > 오늘';
+		background-color: #542;
+	}
+
+	#easy_gantt_menu,
+	#gantt_cont {
+		content: '쉬운간트 > 도구모음+표 전체 배경';
+		border-color: var(--color-darktheme-ln-black);
+		background-color: var(--color-darktheme-bg-default);
+	}
+
+	.redmine .gantt-menu-button {
+		content: '쉬운간트 > 도구모음 버튼';
+		border-color: var(--color-darktheme-ln-button);
+		background-color: var(--color-darktheme-bg-light);
+		color: var(--color-darktheme-text-href-lighter);
+	}
+
+	.redmine .easy-gantt__menu-group--tooltiped ul {
+		content: '쉬운간트 > 도구모음 > [도구] 팝업메뉴';
+		background-color: var(--color-darktheme-bg-strong);
+	}
+
+	.redmine .easy-gantt__menu-group--tooltiped ul:after {
+		content: '쉬운간트 > 도구모음 > [도구] 팝업메뉴';
+		border-color: var(--color-darktheme-ln-black);
+	}
+
+	.gantt_grid_scale,
+	.gantt_task_scale {
+		content: '쉬운간트 > 표제목줄 배경색';
+		background-color: var(--color-darktheme-bg-strong);
+	}
+
+	#easy_gantt .weekend {
+		content: '쉬운간트 > 표제목줄(주말) 배경색';
+		background-color: var(--color-darktheme-bg-black);
+		color: #9BF;
+	}
+
+	#easy_gantt .weekend+.weekend {
+		content: '쉬운간트 > 표제목줄(주말) 배경색';
+		background-color: var(--color-darktheme-bg-black);
+		color: #F99;
+	}
+
+	.gantt_grid_scale .gantt_grid_head_cell,
+	.gantt_task .gantt_task_scale .gantt_scale_cell {
+		content: '쉬운간트 > 표제목줄 전경색';
+		color: var(--color-darktheme-text-default);
+	}
+
+	.gantt_grid .gantt_grid_head_cell,
+	.gantt_grid_scale,
+	#gantt_grid,
+	.gantt_scale_cel,
+	.gantt_task_scale,
+	.gantt_row,
+	.gantt_scale_line,
+	.gantt_task_row,
+	.gantt_cell {
+		content: '쉬운간트 > 내부 선색상';
+		border-color: var(--color-darktheme-ln-table) !important;
+	}
+}
