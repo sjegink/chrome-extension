@@ -1,5 +1,9 @@
 // 중복 선언 금지
 if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
+
+	const CUSTOM_STYLEELEMENT_CLASSNAME = "chrome-extension-style-injected";
+	const CUSTOM_ELEMENT_CLASSNAME = "chrome-extension-html-injected";
+
 	window._$_CONTENT_SCRIPT_INJECTED_$_ = Date.now();
 	chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		switch (message.action) {
@@ -7,9 +11,15 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 				console.log('ChromeExtension says:', message.data ?? 'Hello World!');
 				break;
 			case 'style':
-				{
-					const CUSTOM_STYLEELEMENT_CLASSNAME = "chrome-extension-style-injected";
-					document.head.querySelectorAll(`style.${CUSTOM_STYLEELEMENT_CLASSNAME}`).forEach(styleElement => styleElement.parentNode.removeChild(styleElement));
+				if (message.data == null) {
+					const elements = document.head.querySelectorAll(`style.${CUSTOM_STYLEELEMENT_CLASSNAME}`) || [];
+					elements.forEach(el => el.parentNode.removeChild(el));
+					const elementsCount = elements.length;
+					const log_elementsAlias = 1 < elementsCount < 1 ?
+						`${elementsCount} style elements` :
+						`${elementsCount ? 'A' : 'No'} style element`;
+					console.log(`${log_elementsAlias} has been removed.`);
+				} else {
 					const styleElement = document.createElement('style');
 					styleElement.classList.add(CUSTOM_STYLEELEMENT_CLASSNAME);
 					styleElement.innerHTML = message.data;
@@ -18,9 +28,15 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 				}
 				break;
 			case 'html': {
-				{
-					const CUSTOM_ELEMENT_CLASSNAME = "chrome-extension-html-injected";
-					document.body.querySelectorAll(`.${CUSTOM_ELEMENT_CLASSNAME}`).forEach(styleElement => styleElement.parentNode.removeChild(styleElement));
+				if (message.data == null) {
+					const elements = document.head.querySelectorAll(`.${CUSTOM_ELEMENT_CLASSNAME}`) || [];
+					elements.forEach(el => el.parentNode.removeChild(el));
+					const elementsCount = elements.length;
+					const log_elementsAlias = 1 < elementsCount < 1 ?
+						`${elementsCount} elements` :
+						`${elementsCount ? 'A' : 'No'} element`;
+					console.log(`${log_elementsAlias} has been removed.`);
+				}else{
 					const injectingElement = document.createElement('div');
 					injectingElement.classList.add(CUSTOM_ELEMENT_CLASSNAME);
 					injectingElement.innerHTML = message.data;
