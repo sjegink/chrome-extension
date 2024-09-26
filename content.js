@@ -29,7 +29,7 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 				break;
 			case 'html': {
 				if (message.data == null) {
-					const elements = document.head.querySelectorAll(`.${CUSTOM_ELEMENT_CLASSNAME}`) || [];
+					const elements = document.querySelectorAll(`.${CUSTOM_ELEMENT_CLASSNAME}`) || [];
 					elements.forEach(el => el.parentNode.removeChild(el));
 					const elementsCount = elements.length;
 					const log_elementsAlias = 1 < elementsCount < 1 ?
