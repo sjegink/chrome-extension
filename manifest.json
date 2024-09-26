@@ -7,7 +7,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_icon": "hello_extensions.png"
+    "default_icon": "assets/hello_extensions.png"
   },
   "host_permissions": [
     "*://*/*"

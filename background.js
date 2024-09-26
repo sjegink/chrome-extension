@@ -49,7 +49,7 @@ async function applyOnTab(tab) {
 		await prepareContentScript(tab);
 		await unloadResource(tab.id);
 		return isActive ?
-			injectResource(tab.id, 'style', `dark-theme/calendar.google.com.scss`) :
+			injectResource(tab.id, 'style', `dark-theme/calendar.google.com.css`) :
 			null;
 	}
 	console.log('NOTHING TO DO on this page', tab.url);
@@ -68,7 +68,7 @@ chrome.action.onClicked.addListener((tab) => {
 	const iconPath = isActive ?
 		'hello_extensions_invert.png' :
 		'hello_extensions.png';
-	chrome.action.setIcon({ path: iconPath });
+	chrome.action.setIcon({ path: 'assets/'+iconPath });
 	console.log(`ChromeExtension turned ${isActive ? 'ON' : 'OFF'}!`);
 	applyOnTab();
 });
@@ -148,10 +148,10 @@ function prepareContentScript(tab) {
  * ## injectResource
  * @param {number} tabId identifier of Chrome tab to be injected.
  * @param {string} resourceType = 'style' | 'html'
- * @param {string} resourcePath the relative path of resource file in this extension work directory
+ * @param {string} resourcePath the relative path of resource file in this extension /lib directory
  */
 async function injectResource(tabId, resourceType, resourcePath) {
-	return fetch(chrome.runtime.getURL(resourcePath))
+	return fetch(chrome.runtime.getURL('lib/'+resourcePath))
 		.catch(err => {
 			console.log('error on loading file', resourcePath);
 			throw err;
