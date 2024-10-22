@@ -1,6 +1,57 @@
-importScripts('sass/sass.min.js');
-
-/** @type {boolean} */
+/**
+ * @type {[libDirName: string]: {[key: string]: number?]}}
+ * - Implicit libName on here.
+ * - It will import `/lib/${libDirName}/mapper.json`;
+ * @prop {number} defaultValue
+ */
+const mappings = {
+	'dark-theme': {},
+};
+libLoading = Promise.all(Object.keys(mappings).map(async (libName) => {
+	let rawJson;
+	await fetch(chrome.runtime.getURL(`/lib/${libName}/mapper.json`))
+		.then(async resp => {
+			rawJson = await resp.text();
+			let mappingArr = JSON.parse(rawJson);
+			mappingArr = [mappingArr].flat(); // You may use [{}] or {} freely.
+			rawJson = null;
+			for (let mapping of mappingArr) {
+				if (mapping.label !== undefined && typeof mapping.label !== 'string') throw new Error(`Property 'label' must be an array if exists!`);
+				if (mapping.values !== null && !Array.isArray(mapping.values)) throw new Error(`Property 'values' must be an array or null!`);
+				if (!Array.isArray(mapping.contents)) throw new Error(`Property 'contents' must be an array!`);
+				mapping.contents.forEach((cont, i) => {
+					let ct;
+					ct = cont.match;
+					if (typeof ct !== 'string') {
+						let arr = [ct].flat();
+						for (let j in arr) {
+							let val = arr[j]
+							if (typeof val !== 'string') {
+								throw new Error(`Property 'contents[${i}].match' must be a string|string[]!`);
+							}
+						}
+					}
+					ct = cont.use;
+					let valueCount = mapping.values?.length || 2;
+					if (!Array.isArray(ct) || ct.length < valueCount) throw new Error(`Property 'contents[${i}].use' must be an array(${valueCount})!`);
+					for (let usings of ct) {
+						if (!Array.isArray(usings)) throw new Error(`Property 'contents[${i}].use' must be an array of strings!`);
+						for (let val of usings) {
+							if (typeof val !== 'string') {
+								throw new Error(`Property 'contents[${i}].use' must be an array of strings!`);
+							}
+						}
+					}
+					mapping.value = mapping.defaultValue ?? 0;
+				});
+			}
+			mappings[libName] = mappingArr;
+		}).catch(err => {
+			err.message += `  at "lib/${libName}/mapper.json"`;
+			throw err;
+		});
+}));
+/** @type {boolean} @deprecated */
 let isActive = false;
 
 
@@ -31,28 +82,78 @@ async function onTabLoad(tab) {
  */
 async function onTabFocus(tab) {
 	if (!await calling.resolve()) return;
-	if (isActive) {
-		applyOnTab(tab);
-	} else {
-		applyOnTab(tab, false);
-	}
+	applyOnTab(tab);
 }
 
 /**
  * ## applyOnTab
  * @param {ChromeTab} [tab]
+ * @param {ChromeTab} [libNameAndKeys]
  */
-async function applyOnTab(tab) {
+async function applyOnTab(tab, libNameAndKeys) {
 	tab ??= await getCurrentTab();
-	// Here is an example!
-	if (/^https:\/\/calendar.google.com\/calendar/.test(tab.url)) {
-		await prepareContentScript(tab);
-		await unloadResource(tab.id);
-		return isActive ?
-			injectResource(tab.id, 'style', `dark-theme/calendar.google.com.css`) :
-			null;
+	if(!tab) return; // DevTool is activated
+	libNameAndKeys ??= Object.keys(mappings);
+	// Prepare to matching
+	const contentIdsByMatchKey = {};
+	const filesByContentId = {};
+	const applyContentIds = new Set();
+	const applyLibs = new Set();
+	const applyFiles = new Set();
+	libNameAndKeys.forEach(libNameAndKey => {
+		const [libName, key] = libNameAndKey.split('\t', 2);
+		const mappingArr = mappings[libName];
+		console.debug('libName,!', { mappings, libName, mappingArr });
+		const keys = key ? [key] : Object.keys(mappingArr);
+		for (let key of keys) {
+			const mapping = mappingArr[key]; // FIXME ?? {}
+			const value = mapping.value ?? 0;
+			console.debug('value!', { value });
+			for (let contIndex in mapping.contents) {
+				const contentId = `${libName}\t${key}\t${contIndex}`;
+				const cont = mapping.contents[contIndex];
+				[cont.match].flat().forEach(matchKey => {
+					(contentIdsByMatchKey[matchKey] ??= []).push(contentId);
+				});
+				filesByContentId[contentId] ??= cont.use[value];
+			}
+		}
+	});
+	// match
+	for (const matchKey of Object.keys(contentIdsByMatchKey)) {
+		const contentId = contentIdsByMatchKey[matchKey];
+		const regexp = new RegExp('^' + matchKey
+			.replace(/\*/g, '.*')
+			.replace(/\//g, '\\/')
+			.replace(/\$/g, '\\$')
+			+ '$');
+		if (regexp.test(tab.url)) {
+			applyContentIds.add(contentId);
+		}
 	}
-	console.log('NOTHING TO DO on this page', tab.url);
+	// Listing resource files
+	Array.from(applyContentIds).forEach(contentId => {
+		const files = filesByContentId[contentId];
+		files.forEach(fileName => {
+			const libName = contentId.replace(/\t\d+$/, '');
+			applyLibs.add(libName);
+			const filePath = `lib/${libName}/${fileName}`;
+			applyFiles.add(filePath);
+		});
+	});
+	// Applying
+	await Promise.all(Array.from(applyFiles).map(async (filePath) => {
+		// FIXME: When partial of multiple libraries, Other libs must be stay!
+		await unloadResource(tab.id);
+		if (filePath.endsWith('.css'))
+			return injectResource(tab.id, 'style', path);
+		if (filePath.endsWith('.html'))
+			return injectResource(tab.id, 'html', path);
+		// if(filePath.endsWith('.js'))
+		// return injectResource(tab.id, 'js', path);
+		console.warn(`Unexpected file format : ${path}`);
+	}));
+	console.log(`${applyLibs.size} lib(s) (${applyFiles.size} ress) accepted on this page`, tab.url);
 }
 
 
@@ -68,7 +169,7 @@ chrome.action.onClicked.addListener((tab) => {
 	const iconPath = isActive ?
 		'hello_extensions_invert.png' :
 		'hello_extensions.png';
-	chrome.action.setIcon({ path: 'assets/'+iconPath });
+	chrome.action.setIcon({ path: 'assets/' + iconPath });
 	console.log(`ChromeExtension turned ${isActive ? 'ON' : 'OFF'}!`);
 	applyOnTab();
 });
@@ -89,6 +190,28 @@ chrome.windows.onFocusChanged.addListener((windowId) => {
 // EventOn: Chrome tab switched
 chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
 	chrome.tabs.get(tabId).then(applyOnTab);
+});
+
+// EventOn: Query from pop-ui
+chrome.runtime.onMessage.addListener((payload, { id, origin, url }, callback) => {
+	if (payload.identify !== 'sjegink.chromeExtensionAPI') return console.debug(), callback();
+	if (!Object.hasOwn(payload, 'libName')) {
+		return callback(mappings);
+	}
+	const mappingArr = mappings[payload.libName];
+	if (!Object.hasOwn(payload, 'key')) {
+		return callback(mappingArr);
+	}
+	if (!Object.hasOwn(payload, 'value')) {
+		return callback(mappingArr[payload.key]);
+	}
+	else {
+		console.log({ l: payload.libName, k: payload.key, v: payload.value });
+		mappingArr[payload.key].value = payload.value;
+		console.log(mappingArr[payload.key]);
+		callback();
+		applyOnTab(null, [`${payload.libName}\t${payload.key}`]);
+	}
 });
 
 
@@ -151,14 +274,13 @@ function prepareContentScript(tab) {
  * @param {string} resourcePath the relative path of resource file in this extension /lib directory
  */
 async function injectResource(tabId, resourceType, resourcePath) {
-	return fetch(chrome.runtime.getURL('lib/'+resourcePath))
+	return fetch(chrome.runtime.getURL('lib/' + resourcePath))
 		.catch(err => {
 			console.log('error on loading file', resourcePath);
 			throw err;
 		})
 		.then(resp => {
 			let text = resp.text();
-			if (resourcePath.endsWith('scss')) return compileScss(text);
 			return text;
 		})
 		.then(data => {
@@ -195,14 +317,3 @@ async function sendMessageToTab(tabId, action, data) {
 		});
 	})
 };
-
-/**
- * ## compileScss
- * @param {*} raw text/scss
- * @returns {string} text/css
- */
-async function compileScss(raw) {
-	return new Promise(resolve => {
-		new Sass().compile(raw, resolve);
-	});
-}

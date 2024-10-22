@@ -1,0 +1,28 @@
+[
+	{
+		"label": "DarkTheme",
+		"values": null,
+		"contents": [
+			{
+				"match": [
+					"https://workspace.google.com/*"
+				],
+				"use": [
+					[],
+					[
+						"calendar.google.com.css"
+					]
+				]
+			},
+			{
+				"match": [
+					"*"
+				],
+				"use": [
+					[],
+					[]
+				]
+			}
+		]
+	}
+]

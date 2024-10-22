@@ -1,0 +1,148 @@
+<html>
+<head>
+<meta charset="UTF-8" />
+</head>
+<body>
+	<ul>
+		<li class="sample" data-key="">
+			<label class="label"></label>
+			<div class="value-wrapper">
+				<div class="switch">
+					<div class="switch-ball"></div>
+				</div>
+				<div class="text"></div>
+			</div>
+		</li>
+	</ul>
+
+	<script type="text/javascript" src="./pop-ui.js" defer></script>
+
+	<style type="text/css">
+		:root {
+			--bg-color: #FFF;
+			--bg-hover-color: #EEE;
+			--separator-color: #DDD;
+			--fg-color: #333;
+			--fg-active-color: #0B0;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			body {
+				--bg-color: #2f2f2f;
+				--bg-hover-color: #3f3f3f;
+				--separator-color: #4f4f4f;
+				--fg-color: #DDD;
+				--fg-active-color: inherit;
+			}
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+		}
+
+		ul {
+			margin: 0;
+			padding: 0;
+		}
+
+		/*
+			li
+		*/
+
+		li {
+			position: relative;
+			display: flex;
+			width: 10rem;
+			background-color: var(--bg-color);
+			padding: 1rem;
+			color: var(--fg-color);
+			transition: linear 200ms;
+		}
+
+		li:not(:last-child):after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: .25rem;
+			right: .25rem;
+			display: block;
+			height: 1px;
+			background-color: var(--separator-color);
+		}
+
+		li:hover {
+			background-color: var(--bg-hover-color);
+			cursor: pointer;
+		}
+
+		li.sample {
+			display: none !important;
+		}
+
+		li > * {
+			pointer-events: none;
+		}
+
+		/*
+			label
+		*/
+
+		li label {
+			flex-grow: 1;
+		}
+
+		/*
+			.values
+		*/
+
+		li:not([data-max]) .value-wrapper {
+			flex: 0 0 auto;
+		}
+
+		li:not([data-max]) .text {
+			display: none !important;
+		}
+
+		/*
+			.switch
+		*/
+
+		li .switch {
+			--size: 1rem;
+			--border-width: 2px;
+			position: relative;
+			display: flex;
+			width: calc(var(--size) * 2);
+			height: var(--size);
+			box-shadow: inset 0 0 var(--border-width) var(--border-width) var(--separator-color);
+			border-radius: calc(var(--size) / 2);
+		}
+
+		li[data-max] .switch {
+			display: none !important;
+		}
+
+		li .switch-ball {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			right: 0;
+			width: var(--size);
+			height: var(--size);
+			border-radius: calc(var(--size) / 2);
+			background-color: var(--fg-active-color);
+			transition: ease-out 200ms;
+		}
+
+		li:not([data-value="1"]) .switch-ball {
+			right: calc(100% - var(--size));
+			filter: saturate(0);
+		}
+	</style>
+</body>
+
+</html>
