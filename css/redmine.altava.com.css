@@ -389,4 +389,29 @@
 		content: '쉬운간트 > 내부 선색상';
 		border-color: var(--color-darktheme-ln-table) !important;
 	}
+
+	.gantt_cell + .gantt_cell, .gantt_side_content {
+		content: '쉬운간트 > 일반 텍스트색상';
+		color: var(--color-darktheme-text-dim) !important;
+	}
+
+	.gantt-grid-milestone-bullet,
+	div.gantt_task_line.gantt_milestone-type .gantt_task_content {
+		content: '쉬운간트 > 마일스톤 ◆표식 색상';
+		background-color: var(--color-darktheme-bg-light) !important;
+		border-color: var(--color-darktheme-ln-guide);
+	}
+
+	.gantt_grid_data .gantt_row.gantt_selected, .gantt_grid_data .gantt_row.odd.gantt_selected, .gantt_task_row.gantt_selected {
+		content: '쉬운간트 > 행 선택 배경 > 제목열';
+		background-color: #5f5f5f;
+	}
+	.gantt_task_bg.inited > svg > rect:first-child {
+		content: '쉬운간트 > 행 선택 배경 > 내용열';
+		filter: invert(1) contrast(0) brightness(.75);
+	}
+
+	.gantt-tooltip {
+		background-color: var(--color-darktheme-bg-black);
+	}
 }
