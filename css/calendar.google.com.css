@@ -1,0 +1,11 @@
+html {
+	background-color: #FFF;
+	filter: invert(1) hue-rotate(180deg);
+}
+img {
+	background-color: #FFF;
+	filter: invert(1) hue-rotate(180deg);
+}
+*[style*="background-image"] {
+	filter: invert(1) hue-rotate(180deg);
+}
