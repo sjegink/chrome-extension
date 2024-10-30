@@ -306,6 +306,11 @@
 		content: '간트 > 배경색';
 		background-color: var(--color-darktheme-bg-strong) !important;
 	}
+	.gantt_hdr.nwday {
+		content: '간트 > 주말';
+		background-color: var(--color-darktheme-bg-strong) !important;
+		color: var(--color-darktheme-text-default) !important;
+	}
 
 	table.cal,
 	table.cal td {
