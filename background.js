@@ -31,6 +31,7 @@ function onTabActive() {
 			});
 		}
 		if ([
+			/https:\/\/translate\.google\.com\//,
 			/https:\/\/www\.docswave\.com\//,
 		].map(re => re.test(tab.url)).includes(true)) {
 			await injectContentJS(tab);
