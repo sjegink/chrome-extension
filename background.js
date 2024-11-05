@@ -31,8 +31,9 @@ function onTabActive() {
 			});
 		}
 		if ([
-			/https:\/\/translate\.google\.com\//,
-			/https:\/\/www\.docswave\.com\//,
+			/^https:\/\/translate\.google\.com\//,
+			/^https:\/\/fontawesome\.com\//,
+			/^https:\/\/www\.docswave\.com\//,
 		].map(re => re.test(tab.url)).includes(true)) {
 			await injectContentJS(tab);
 			const cssData = await fetch(chrome.runtime.getURL(`css/dark-invert.css`)).then(resp => resp.text());
