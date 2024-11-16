@@ -5,7 +5,7 @@
  * @prop {number} defaultValue
  */
 const mappings = {
-	'dark-theme': {},
+	'sample': {},
 };
 libLoading = Promise.all(Object.keys(mappings).map(async (libName) => {
 	let rawJson;
@@ -55,11 +55,7 @@ libLoading = Promise.all(Object.keys(mappings).map(async (libName) => {
 let isActive = false;
 
 
-//    ████████  █████  ███████ ██   ██ ███████ 
-//       ██    ██   ██ ██      ██  ██  ██      
-//       ██    ███████ ███████ █████   ███████ 
-//       ██    ██   ██      ██ ██  ██       ██ 
-//       ██    ██   ██ ███████ ██   ██ ███████ 
+// #region Tasks
 
 /**
  * ## onTabLoad
@@ -69,9 +65,7 @@ let isActive = false;
  */
 async function onTabLoad(tab) {
 	if (!await calling.resolve()) return;
-	if (isActive) {
-		applyOnTab(tab);
-	}
+	applyOnTab(tab);
 }
 
 /**
@@ -92,7 +86,7 @@ async function onTabFocus(tab) {
  */
 async function applyOnTab(tab, libNameAndKeys) {
 	tab ??= await getCurrentTab();
-	if(!tab) return; // DevTool is activated
+	if (!tab) return; // DevTool is activated
 	libNameAndKeys ??= Object.keys(mappings);
 	// Prepare to matching
 	const contentIdsByMatchKey = {};
@@ -106,7 +100,7 @@ async function applyOnTab(tab, libNameAndKeys) {
 		console.debug('libName,!', { mappings, libName, mappingArr });
 		const keys = key ? [key] : Object.keys(mappingArr);
 		for (let key of keys) {
-			const mapping = mappingArr[key]; // FIXME ?? {}
+			const mapping = mappingArr[key] ?? {};
 			const value = mapping.value ?? 0;
 			console.debug('value!', { value });
 			for (let contIndex in mapping.contents) {
@@ -121,47 +115,45 @@ async function applyOnTab(tab, libNameAndKeys) {
 	});
 	// match
 	for (const matchKey of Object.keys(contentIdsByMatchKey)) {
-		const contentId = contentIdsByMatchKey[matchKey];
+		const contentIds = contentIdsByMatchKey[matchKey];
 		const regexp = new RegExp('^' + matchKey
 			.replace(/\*/g, '.*')
 			.replace(/\//g, '\\/')
 			.replace(/\$/g, '\\$')
 			+ '$');
 		if (regexp.test(tab.url)) {
-			applyContentIds.add(contentId);
+			contentIds.forEach(contentId => {
+				applyContentIds.add(contentId);
+			});
 		}
 	}
 	// Listing resource files
 	Array.from(applyContentIds).forEach(contentId => {
 		const files = filesByContentId[contentId];
 		files.forEach(fileName => {
-			const libName = contentId.replace(/\t\d+$/, '');
+			const libName = contentId.replace(/\t.*$/, '');
 			applyLibs.add(libName);
-			const filePath = `lib/${libName}/${fileName}`;
+			const filePath = `${libName}/${fileName}`;
 			applyFiles.add(filePath);
 		});
 	});
 	// Applying
+	// FIXME: When partial of multiple libraries, Other libs must be stay!
+	await unloadResource(tab.id);
 	await Promise.all(Array.from(applyFiles).map(async (filePath) => {
-		// FIXME: When partial of multiple libraries, Other libs must be stay!
-		await unloadResource(tab.id);
 		if (filePath.endsWith('.css'))
-			return injectResource(tab.id, 'style', path);
+			return injectResource(tab.id, 'style', filePath);
 		if (filePath.endsWith('.html'))
-			return injectResource(tab.id, 'html', path);
+			return injectResource(tab.id, 'html', filePath);
 		// if(filePath.endsWith('.js'))
 		// return injectResource(tab.id, 'js', path);
-		console.warn(`Unexpected file format : ${path}`);
+		console.warn(`Unexpected file format : ${filePath}`);
 	}));
 	console.log(`${applyLibs.size} lib(s) (${applyFiles.size} ress) accepted on this page`, tab.url);
 }
 
-
-//    ███████ ██    ██ ███████ ███    ██ ████████     ██      ██ ███████ ████████ ███████ ███    ██ ███████ ██████  ███████ 
-//    ██      ██    ██ ██      ████   ██    ██        ██      ██ ██         ██    ██      ████   ██ ██      ██   ██ ██      
-//    █████   ██    ██ █████   ██ ██  ██    ██        ██      ██ ███████    ██    █████   ██ ██  ██ █████   ██████  ███████ 
-//    ██       ██  ██  ██      ██  ██ ██    ██        ██      ██      ██    ██    ██      ██  ██ ██ ██      ██   ██      ██ 
-//    ███████   ████   ███████ ██   ████    ██        ███████ ██ ███████    ██    ███████ ██   ████ ███████ ██   ██ ███████ 
+// #endregion
+// #region Event Listeners
 
 // EventOn: Extension Icon Click
 chrome.action.onClicked.addListener((tab) => {
@@ -208,18 +200,15 @@ chrome.runtime.onMessage.addListener((payload, { id, origin, url }, callback) =>
 	else {
 		console.log({ l: payload.libName, k: payload.key, v: payload.value });
 		mappingArr[payload.key].value = payload.value;
-		console.log(mappingArr[payload.key]);
+		console.log('setValue', mappingArr[payload.key]);
 		callback();
 		applyOnTab(null, [`${payload.libName}\t${payload.key}`]);
 	}
 });
 
 
-//    ██    ██ ████████ ██ ██      ██ ████████ ██ ███████ ███████ 
-//    ██    ██    ██    ██ ██      ██    ██    ██ ██      ██      
-//    ██    ██    ██    ██ ██      ██    ██    ██ █████   ███████ 
-//    ██    ██    ██    ██ ██      ██    ██    ██ ██           ██ 
-//     ██████     ██    ██ ███████ ██    ██    ██ ███████ ███████ 
+// #endregion
+// #region Utilities
 
 /**
  * ## calling
@@ -317,3 +306,5 @@ async function sendMessageToTab(tabId, action, data) {
 		});
 	})
 };
+
+// #endregion

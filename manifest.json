@@ -10,6 +10,13 @@
     "default_popup": "assets/pop-ui.html",
     "default_icon": "assets/hello_extensions.png"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "host_permissions": [
     "*://*/*"
   ],

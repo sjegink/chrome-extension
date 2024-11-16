@@ -1,11 +1,13 @@
 // 중복 선언 금지
 if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
+	console.info(`This page being affected by ChromeExtension!`)
 
 	const CUSTOM_STYLEELEMENT_CLASSNAME = "chrome-extension-style-injected";
 	const CUSTOM_ELEMENT_CLASSNAME = "chrome-extension-html-injected";
 
 	window._$_CONTENT_SCRIPT_INJECTED_$_ = Date.now();
 	chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+		console.debug('ChromeExtension signal input:', message.action);
 		switch (message.action) {
 			case 'hello':
 				console.log('ChromeExtension says:', message.data ?? 'Hello World!');

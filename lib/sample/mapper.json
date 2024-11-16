@@ -1,0 +1,28 @@
+[
+	{
+		"label": "Filter.Invert",
+		"values": null,
+		"contents": [
+			{
+				"match": [
+					"*"
+				],
+				"use": [
+					[],
+					[
+						"invert.css"
+					]
+				]
+			},
+			{
+				"match": [
+					"*"
+				],
+				"use": [
+					[],
+					[]
+				]
+			}
+		]
+	}
+]

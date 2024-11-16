@@ -13,15 +13,14 @@ window.onload = async () => {
 	// 		}],
 	// };
 	const libMappings = await sendMessage();
-	console.debug(libMappings);
 	Object
 		.entries(libMappings)
 		.forEach(([libName, mappings]) => {
 			mappings = [mappings].flat();
 			mappings.forEach((mapping, key) => {
-				const { label, values } = mapping;
-				if (Array.isArray(values) === false) return createListItem(libName, key, label, Boolean, 0);
-				else return createListItem(libName, key, label, values, values);
+				const { label, values, value: defaultValue } = mapping;
+				if (Array.isArray(values) === false) return createListItem(libName, key, label, Boolean, defaultValue);
+				else return createListItem(libName, key, label, values, defaultValue);
 			});
 		});
 }
@@ -54,7 +53,6 @@ async function sendMessage(...args) {
 const valuesMap = new Map();
 function createListItem(libName, key, label, values, defaultValue) {
 	if (!Array.isArray(values)) {
-		defaultValue = values;
 		values = null;
 	}
 	const elSample = document.querySelector('li.sample');
