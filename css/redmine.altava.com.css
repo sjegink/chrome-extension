@@ -102,6 +102,10 @@
 		color: var(--color-darktheme-text-default);
 	}
 
+	.tribute-container ul {
+		background-color: var(--color-darktheme-bg-default);
+	}
+
 	/*
 		1
 		메뉴
