@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Hello Extensions",
-  "description": "Base Level Extension",
+  "name": "sjeg's Brightness Inversion",
+  "description": "__MSG_extension_description__",
+  "default_locale": "en",
   "version": "1.0",
   "background": {
     "service_worker": "background.js"
