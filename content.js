@@ -11,7 +11,7 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 		console.debug('ChromeExtension signal input:', message.action);
 		switch (message.action) {
 			case 'hello':
-				console.log('ChromeExtension says:', message.data ?? 'Hello World!');
+				console.debug('ChromeExtension says:', message.data ?? 'Hello World!');
 				break;
 			case 'style':
 				if (!message.hasOwnProperty('data')) {
@@ -25,13 +25,13 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 					const log_elementsAlias = 1 < elementsCount ?
 						`${elementsCount} style elements` :
 						`${elementsCount ? 'A' : 'No'} style element`;
-					console.log(`${log_elementsAlias} has been removed.`);
+					console.debug(`${log_elementsAlias} has been removed.`);
 				} else {
 					const styleElement = document.createElement('style');
 					styleElement.classList.add(CUSTOM_STYLEELEMENT_CLASSNAME);
 					styleElement.innerHTML = message.data;
 					document.head.appendChild(styleElement);
-					console.log('A style element has been injected.');
+					console.debug('A style element has been injected.');
 				}
 				break;
 			case 'html': {
@@ -46,13 +46,13 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 					const log_elementsAlias = 1 < elementsCount ?
 						`${elementsCount} elements` :
 						`${elementsCount ? 'A' : 'No'} element`;
-					console.log(`${log_elementsAlias} has been removed.`);
+					console.debug(`${log_elementsAlias} has been removed.`);
 				} else {
 					const injectingElement = document.createElement('div');
 					injectingElement.classList.add(CUSTOM_ELEMENT_CLASSNAME);
 					injectingElement.innerHTML = message.data;
 					document.body.appendChild(injectingElement);
-					console.log('A html element has been injected.');
+					console.debug('A html element has been injected.');
 				}
 				break;
 			}
@@ -66,7 +66,7 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 				}
 				return sendResponse(false);
 			default:
-				console.log('unknown message listen', message);
+				console.debug('unknown message listen', message);
 		}
 		sendResponse(true);
 	});

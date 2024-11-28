@@ -123,7 +123,7 @@ function prepareContentScript(tab) {
 async function injectResource(tabId, resourceType, resourcePath) {
 	return fetch(chrome.runtime.getURL('lib/' + resourcePath))
 		.catch(err => {
-			console.log('error on loading file', resourcePath);
+			console.warn('error on loading file', resourcePath);
 			throw err;
 		})
 		.then(resp => {
@@ -173,7 +173,6 @@ async function sendMessageToTab(tabId, action, data) {
 	if(data !== undefined) payload.data = data;
 	return new Promise(resolve => {
 		chrome.tabs.sendMessage(tabId, payload, messageResponse => {
-			console.log({ messageResponse });
 			resolve(messageResponse);
 		});
 	})
