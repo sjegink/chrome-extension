@@ -19,13 +19,15 @@ async function onTabLoad(tab) {
  * @returns {void}
  */
 async function onTabFocus(tab) {
-	await prepareContentScript(tab);
-	const resourceType = 'style';
-	const isActive = 0 < await countResource(tab.id, resourceType);
-	const iconPath = isActive ?
-		'hello_extensions_invert.png' :
-		'hello_extensions.png';
-	chrome.action.setIcon({ path: 'assets/' + iconPath });
+	if(tab) {
+		await prepareContentScript(tab);
+		const resourceType = 'style';
+		const isActive = 0 < await countResource(tab.id, resourceType);
+		const iconPath = isActive ?
+			'hello_extensions_invert.png' :
+			'hello_extensions.png';
+		chrome.action.setIcon({ path: 'assets/' + iconPath });
+	}
 }
 
 /**
@@ -102,7 +104,7 @@ async function getCurrentTab() {
  * @param {*} tab 
  */
 function prepareContentScript(tab) {
-	if (!/^https?:/.test(tab.url)) {
+	if (!tab || !/^https?:/.test(tab.url)) {
 		// Cannot access a chrome:// URL
 		return;
 	}
