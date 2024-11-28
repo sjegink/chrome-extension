@@ -21,7 +21,9 @@ async function onTabLoad(tab) {
 async function onTabFocus(tab) {
 	const resourceType = 'style';
 	tab ??= await getCurrentTab();
-	if (tab) {
+	if (!checkInjectable(tab)) {
+		setActionIcon(null);
+	} else {
 		await prepareContentScript(tab);
 		setActionIcon(0 < await countResource(tab.id, resourceType));
 	}
@@ -33,25 +35,31 @@ async function onTabFocus(tab) {
  */
 async function applyOnTab(tab) {
 	tab ??= await getCurrentTab();
-	const tabId = tab.id;
-	await prepareContentScript(tab);
-
-	const resourceType = 'style';
-	const alreadyInjected = 0 < await countResource(tabId, resourceType);
-
-	if (!alreadyInjected) {
-		injectResource(tabId, resourceType, 'brightness-invert/brightness-invert.css');
-		setActionIcon(true);
+	if (!checkInjectable(tab)) {
+		setActionIcon(null);
 	} else {
-		unloadResource(tabId, resourceType);
-		setActionIcon(false);
+		const tabId = tab.id;
+		await prepareContentScript(tab);
+
+		const resourceType = 'style';
+		const alreadyInjected = 0 < await countResource(tabId, resourceType);
+
+		if (!alreadyInjected) {
+			injectResource(tabId, resourceType, 'brightness-invert/brightness-invert.css');
+			setActionIcon(true);
+		} else {
+			unloadResource(tabId, resourceType);
+			setActionIcon(false);
+		}
 	}
 }
 
 async function setActionIcon(isActive) {
-	const iconPath = isActive ?
-		'icon_sun_invert.png' :
-		'icon_sun.png';
+	const iconPath = isActive == null ?
+		'icon_sun_disabled.png' :
+		isActive ?
+			'icon_sun_invert.png' :
+			'icon_sun.png';
 	chrome.action.setIcon({ path: 'assets/' + iconPath });
 }
 
@@ -104,14 +112,24 @@ async function getCurrentTab() {
  * @param {*} tab 
  */
 function prepareContentScript(tab) {
-	if (!tab || !/^https?:/.test(tab.url)) {
-		// Cannot access a chrome:// URL
-		return;
-	}
 	return chrome.scripting.executeScript({
 		target: { tabId: tab.id },
 		files: ['content.js'],
 	});
+}
+
+/**
+ * ## checkInjectable
+ * @param {*} tab 
+ * @returns {boolean} false if the state in tab cannot inject.
+ */
+function checkInjectable(tab) {
+	if (!tab) return false;
+	if ([
+		/^https?:/,
+		// Cannot access a chrome:// URL
+	].filter(regex => regex.test(tab.url)).length < 1) return false;
+	return true;
 }
 
 /**
@@ -151,6 +169,11 @@ async function unloadResource(tabId, resourceType) {
 	}
 }
 
+/**
+ * ## countResource
+ * @param {number} tabId identifier of Chrome tab that was injected.
+ * @param {string} resourceType = 'style' | 'html'
+ */
 async function countResource(tabId, resourceType) {
 	if (resourceType) {
 		return sendMessageToTab(tabId, resourceType);
