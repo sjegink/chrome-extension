@@ -1,5 +1,6 @@
 // 중복 선언 금지
 if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
+	let time_captureBegan;
 	console.info(`This page being affected by ChromeExtension!`)
 
 	const CUSTOM_STYLEELEMENT_CLASSNAME = "chrome-extension-style-injected";
@@ -13,11 +14,15 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 				console.log('ChromeExtension says:', message.data ?? 'Hello World!');
 				break;
 			case 'style':
+				if (!message.hasOwnProperty('data')) {
+					const elements = document.head.querySelectorAll(`style.${CUSTOM_STYLEELEMENT_CLASSNAME}`) || [];
+					return sendResponse(elements.length);
+				}
 				if (message.data == null) {
 					const elements = document.head.querySelectorAll(`style.${CUSTOM_STYLEELEMENT_CLASSNAME}`) || [];
 					elements.forEach(el => el.parentNode.removeChild(el));
 					const elementsCount = elements.length;
-					const log_elementsAlias = 1 < elementsCount < 1 ?
+					const log_elementsAlias = 1 < elementsCount ?
 						`${elementsCount} style elements` :
 						`${elementsCount ? 'A' : 'No'} style element`;
 					console.log(`${log_elementsAlias} has been removed.`);
@@ -30,15 +35,19 @@ if (!window._$_CONTENT_SCRIPT_INJECTED_$_) {
 				}
 				break;
 			case 'html': {
+				if (!message.hasOwnProperty('data')) {
+					const elements = document.querySelectorAll(`.${CUSTOM_ELEMENT_CLASSNAME}`) || [];
+					return sendResponse(elements.length);
+				}
 				if (message.data == null) {
 					const elements = document.querySelectorAll(`.${CUSTOM_ELEMENT_CLASSNAME}`) || [];
 					elements.forEach(el => el.parentNode.removeChild(el));
 					const elementsCount = elements.length;
-					const log_elementsAlias = 1 < elementsCount < 1 ?
+					const log_elementsAlias = 1 < elementsCount ?
 						`${elementsCount} elements` :
 						`${elementsCount ? 'A' : 'No'} element`;
 					console.log(`${log_elementsAlias} has been removed.`);
-				}else{
+				} else {
 					const injectingElement = document.createElement('div');
 					injectingElement.classList.add(CUSTOM_ELEMENT_CLASSNAME);
 					injectingElement.innerHTML = message.data;

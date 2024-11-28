@@ -1,0 +1,6 @@
+@media (prefers-color-scheme: dark) {
+	:root {
+		background-color: #FFF;
+		filter: invert(0.9) hue-rotate(180deg);
+	}
+}
