@@ -3,7 +3,7 @@
   "name": "sjeg's Brightness Inversion",
   "description": "__MSG_extension_description__",
   "default_locale": "en",
-  "version": "1.0",
+  "version": "1.1",
   "background": {
     "service_worker": "background.js"
   },
