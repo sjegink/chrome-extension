@@ -19,14 +19,11 @@ async function onTabLoad(tab) {
  * @returns {void}
  */
 async function onTabFocus(tab) {
-	if(tab) {
+	const resourceType = 'style';
+	tab ??= await getCurrentTab();
+	if (tab) {
 		await prepareContentScript(tab);
-		const resourceType = 'style';
-		const isActive = 0 < await countResource(tab.id, resourceType);
-		const iconPath = isActive ?
-			'icon_sun_invert.png' :
-			'icon_sun.png';
-		chrome.action.setIcon({ path: 'assets/' + iconPath });
+		setActionIcon(0 < await countResource(tab.id, resourceType));
 	}
 }
 
@@ -44,9 +41,18 @@ async function applyOnTab(tab) {
 
 	if (!alreadyInjected) {
 		injectResource(tabId, resourceType, 'brightness-invert/brightness-invert.css');
+		setActionIcon(true);
 	} else {
 		unloadResource(tabId, resourceType);
+		setActionIcon(false);
 	}
+}
+
+async function setActionIcon(isActive) {
+	const iconPath = isActive ?
+		'icon_sun_invert.png' :
+		'icon_sun.png';
+	chrome.action.setIcon({ path: 'assets/' + iconPath });
 }
 
 // #endregion
@@ -54,12 +60,6 @@ async function applyOnTab(tab) {
 
 // EventOn: Extension Icon Click
 chrome.action.onClicked.addListener((tab) => {
-	// isActive ^= !!1;
-	// const iconPath = isActive ?
-	// 	'hello_extensions_invert.png' :
-	// 	'hello_extensions.png';
-	// chrome.action.setIcon({ path: 'assets/' + iconPath });
-	// console.log(`ChromeExtension turned ${isActive ? 'ON' : 'OFF'}!`);
 	applyOnTab();
 });
 
@@ -170,7 +170,7 @@ async function countResource(tabId, resourceType) {
  */
 async function sendMessageToTab(tabId, action, data) {
 	const payload = { action };
-	if(data !== undefined) payload.data = data;
+	if (data !== undefined) payload.data = data;
 	return new Promise(resolve => {
 		chrome.tabs.sendMessage(tabId, payload, messageResponse => {
 			resolve(messageResponse);
