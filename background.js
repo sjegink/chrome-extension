@@ -24,8 +24,8 @@ async function onTabFocus(tab) {
 		const resourceType = 'style';
 		const isActive = 0 < await countResource(tab.id, resourceType);
 		const iconPath = isActive ?
-			'hello_extensions_invert.png' :
-			'hello_extensions.png';
+			'icon_sun_invert.png' :
+			'icon_sun.png';
 		chrome.action.setIcon({ path: 'assets/' + iconPath });
 	}
 }
