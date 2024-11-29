@@ -1,42 +1,40 @@
-let isActive = false;
-
+/*
+ * Chrome Extension / Background.js
+ * It will be loaded by manifest.json
+ */
 
 // #region Tasks
 
 /**
- * ## onTabLoad
- * 보고 있던 탭에, 페이지가 로드되었을 경우.
- * @param {ChromeTab?} tab
- * @returns {void}
- */
-async function onTabLoad(tab) {
-}
-
-/**
  * ## onTabFocus
- * 탭이 포커스를 얻었을 경우.
  * @param {ChromeTab?} tab
- * @returns {void}
+ * @returns {Promise}
  */
 async function onTabFocus(tab) {
 	const resourceType = 'style';
 	tab ??= await getCurrentTab();
-	if (!checkInjectable(tab)) {
-		setActionIcon(null);
-	} else {
-		await prepareContentScript(tab);
-		setActionIcon(0 < await countResource(tab.id, resourceType));
+	if (!tab) {
+		return;
 	}
+	if (!checkInjectable(tab)) {
+		actionIcon.set(null);
+		return;
+	}
+	await prepareContentScript(tab);
+	actionIcon.set(0 < await countResource(tab.id, resourceType));
 }
 
 /**
  * ## applyOnTab
- * @param {ChromeTab} [tab]
+ * The tab will be inverted!
+ * @param {ChromeTab?} [tab]
+ * @returns {Promise}
  */
-async function applyOnTab(tab) {
+async function applyOnTab(tab, isActive) {
+	isActive ??= true;
 	tab ??= await getCurrentTab();
 	if (!checkInjectable(tab)) {
-		setActionIcon(null);
+		actionIcon.set(null);
 	} else {
 		const tabId = tab.id;
 		await prepareContentScript(tab);
@@ -44,23 +42,68 @@ async function applyOnTab(tab) {
 		const resourceType = 'style';
 		const alreadyInjected = 0 < await countResource(tabId, resourceType);
 
-		if (!alreadyInjected) {
-			injectResource(tabId, resourceType, 'brightness-invert/brightness-invert.css');
-			setActionIcon(true);
-		} else {
-			unloadResource(tabId, resourceType);
-			setActionIcon(false);
+		actionIcon.set(isActive);
+		if (isActive && !alreadyInjected) {
+			await injectResource(tabId, resourceType, 'brightness-invert/brightness-invert.css');
+		} else if (alreadyInjected){
+			await unloadResource(tabId, resourceType);
 		}
 	}
 }
 
-async function setActionIcon(isActive) {
-	const iconPath = isActive == null ?
-		'icon_sun_disabled.png' :
-		isActive ?
-			'icon_sun_invert.png' :
-			'icon_sun.png';
-	chrome.action.setIcon({ path: 'assets/' + iconPath });
+/**
+ * ## recoverOnTab
+ * The tab will be original!
+ * @param {ChromeTab?} [tab]
+ * @returns {Promise}
+ */
+async function recoverOnTab(tab) {
+	return applyOnTab(tab, false);
+}
+
+/**
+ * ## reapplyOnTab
+ * The tab will be invert or not: by action icon.
+ * @param {ChromeTab?} [tab]
+ * @returns {Promise}
+ */
+async function reapplyOnTab(tab) {
+	const isActive = actionIcon.get();
+	return applyOnTab(tab, isActive);
+}
+
+/**
+ * ## toggleOnTab
+ * toggle actionIcon on/off, and the tab will be invert or not: by action icon.
+ * @param {ChromeTab?} [tab]
+ * @returns {Promise}
+ */
+async function toggleOnTab(tab) {
+	const wasActive = actionIcon.get();
+	const isActive = !wasActive;
+	return applyOnTab(tab, isActive);
+}
+
+/**
+ * ## ActionIcon
+ */
+const actionIcon = {
+	_value: false,
+	_paths: {
+		null: `assets/icon_sun_disabled.png`,
+		true: `assets/icon_sun_invert.png`,
+		false: `assets/icon_sun.png`,
+	},
+	/** @returns {boolean|null} getActionIcon */
+	get() {
+		return this._value;
+	},
+	/** @param {boolean|null} isActive setActionIcon */
+	set(isActive) {
+		this._value = isActive;
+		const path = this._paths[this._value ?? null];
+		chrome.action.setIcon({ path });
+	},
 }
 
 // #endregion
@@ -68,12 +111,13 @@ async function setActionIcon(isActive) {
 
 // EventOn: Extension Icon Click
 chrome.action.onClicked.addListener((tab) => {
-	applyOnTab();
+	toggleOnTab(tab);
 });
 
 // EventOn: An page loaded
+// : Even also when page changed by navigation
 chrome.webNavigation.onCompleted.addListener(function (details) {
-	onTabLoad(undefined);
+	reapplyOnTab();
 });
 
 // EventOn: Chrome(window) get focus (or lost)
