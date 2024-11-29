@@ -4,6 +4,11 @@
   "description": "__MSG_extension_description__",
   "default_locale": "en",
   "version": "1.3",
+  "icons": {
+    "16": "assets/icon_sun_invert.png",
+    "48": "assets/icon_sun_invert.png",
+    "128": "assets/icon_sun_invert.png"
+  },
   "background": {
     "service_worker": "background.js"
   },
