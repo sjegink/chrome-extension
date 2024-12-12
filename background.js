@@ -3,6 +3,34 @@
  * It will be loaded by manifest.json
  */
 
+// #region Event Listeners
+
+// EventOn: Extension Icon Click
+chrome.action.onClicked.addListener((tab) => {
+	toggleOnTab(tab);
+});
+
+// EventOn: An page loaded
+// : Even also when page changed by navigation
+chrome.webNavigation.onCompleted.addListener(function (details) {
+	reapplyOnTab();
+});
+
+// EventOn: Chrome(window) get focus (or lost)
+chrome.windows.onFocusChanged.addListener((windowId) => {
+	const isLostFocus = windowId < 0;
+	if (!isLostFocus) {
+		onTabFocus(undefined);
+	}
+});
+
+// EventOn: Chrome tab switched
+chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
+	chrome.tabs.get(tabId).then(onTabFocus);
+});
+
+
+// #endregion
 // #region Tasks
 
 /**
@@ -105,34 +133,6 @@ const actionIcon = {
 		chrome.action.setIcon({ path });
 	},
 }
-
-// #endregion
-// #region Event Listeners
-
-// EventOn: Extension Icon Click
-chrome.action.onClicked.addListener((tab) => {
-	toggleOnTab(tab);
-});
-
-// EventOn: An page loaded
-// : Even also when page changed by navigation
-chrome.webNavigation.onCompleted.addListener(function (details) {
-	reapplyOnTab();
-});
-
-// EventOn: Chrome(window) get focus (or lost)
-chrome.windows.onFocusChanged.addListener((windowId) => {
-	const isLostFocus = windowId < 0;
-	if (!isLostFocus) {
-		onTabFocus(undefined);
-	}
-});
-
-// EventOn: Chrome tab switched
-chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
-	chrome.tabs.get(tabId).then(onTabFocus);
-});
-
 
 // #endregion
 // #region Utilities
