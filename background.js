@@ -6,28 +6,35 @@
 // #region Event Listeners
 
 // EventOn: Extension Icon Click
-chrome.action.onClicked.addListener((tab) => {
+chrome.action.onClicked.addListener(onActionIconClicked);
+function onActionIconClicked(tab) {
 	toggleOnTab(tab);
-});
+}
 
 // EventOn: An page loaded
 // : Even also when page changed by navigation
-chrome.webNavigation.onCompleted.addListener(function (details) {
+chrome.webNavigation.onCompleted.addListener(onNavCompleted);
+/**
+ * @param {WebNavigationDetails} details 
+ */
+function onNavCompleted(details) {
 	reapplyOnTab();
-});
+}
 
 // EventOn: Chrome(window) get focus (or lost)
-chrome.windows.onFocusChanged.addListener((windowId) => {
+chrome.windows.onFocusChanged.addListener(onWindowFocusChanged);
+function onWindowFocusChanged(windowId) {
 	const isLostFocus = windowId < 0;
 	if (!isLostFocus) {
 		onTabFocus(undefined);
 	}
-});
+}
 
 // EventOn: Chrome tab switched
-chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
+chrome.tabs.onActivated.addListener(onTabActivated);
+function onTabActivated({ tabId, windowId }) {
 	chrome.tabs.get(tabId).then(onTabFocus);
-});
+}
 
 
 // #endregion
@@ -73,7 +80,7 @@ async function applyOnTab(tab, isActive) {
 		actionIcon.set(isActive);
 		if (isActive && !alreadyInjected) {
 			await injectResource(tabId, resourceType, 'brightness-invert/brightness-invert.css');
-		} else if (alreadyInjected){
+		} else if (alreadyInjected) {
 			await unloadResource(tabId, resourceType);
 		}
 	}
