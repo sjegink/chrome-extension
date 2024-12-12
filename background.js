@@ -17,7 +17,9 @@ chrome.webNavigation.onCompleted.addListener(onNavCompleted);
 /**
  * @param {WebNavigationDetails} details 
  */
-function onNavCompleted(details) {
+async function onNavCompleted(details) {
+	const tab = await chrome.tabs.get(details.tabId);
+	if(new URL(tab.url).origin !== new URL(details.url).origin) return; // Ignore external ads
 	reapplyOnTab();
 }
 
@@ -171,7 +173,7 @@ function prepareContentScript(tab) {
 
 /**
  * ## checkInjectable
- * @param {*} tab 
+ * @param {{url: string}} tab 
  * @returns {boolean} false if the state in tab cannot inject.
  */
 function checkInjectable(tab) {

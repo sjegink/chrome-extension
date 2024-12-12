@@ -3,7 +3,7 @@
   "name": "sjegink's Brightness Inversion",
   "description": "__MSG_extension_description__",
   "default_locale": "en",
-  "version": "1.4",
+  "version": "1.5",
   "icons": {
     "16": "assets/icon_sun_invert.png",
     "48": "assets/icon_sun_invert.png",
