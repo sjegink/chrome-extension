@@ -1,19 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "Hello Extensions",
-  "description": "Base Level Extension",
+  "name": "sjegink's Youtube Video Utilities",
+  "description": "__MSG_extension_description__",
+  "default_locale": "en",
   "version": "1.0",
+  "icons": {
+    "16": "assets/youtube_repeat.png",
+    "48": "assets/youtube_repeat.png",
+    "128": "assets/youtube_repeat.png"
+  },
   "background": {
     "service_worker": "background.js"
   },
-  "action": {
-    "default_popup": "assets/pop-ui.html",
-    "default_icon": "assets/hello_extensions.png"
-  },
   "content_scripts": [
     {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["content.js"],
+      "matches": ["https://www.youtube.com/watch*"],
+      "js": ["lib/content_youtube.js"],
       "run_at": "document_idle"
     }
   ],
@@ -21,8 +23,5 @@
     "*://*/*"
   ],
   "permissions": [
-    "tabs",
-    "webNavigation",
-    "scripting"
   ]
 }
